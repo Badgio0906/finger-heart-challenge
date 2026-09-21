@@ -7,6 +7,8 @@ const HAND_CHANGE_INTERVAL := 0.65
 const RESULT_DURATION := 0.8
 const HAND_FILES := ["heart", "fox", "peace", "ok", "thumbs_up", "open", "point"]
 const HAND_NAMES := ["指ハート", "キツネ", "ピース", "OKサイン", "サムズアップ", "手のひら", "人差し指"]
+# Generated source sprites contain both hands. The body always raises her left arm.
+const RIGHT_HAND_SOURCES := [HandType.HEART, HandType.FOX, HandType.THUMBS_UP, HandType.POINT]
 const INK := Color("543b4b")
 const ACCENT := Color("e85d80")
 const MUTED := Color("927783")
@@ -188,6 +190,7 @@ func _build_ui() -> void:
 	target_crop.atlas = load("res://assets/art_v2/heart.png")
 	target_crop.region = Rect2(390, 160, 470, 740)
 	target.texture = target_crop
+	target.flip_h = HandType.HEART in RIGHT_HAND_SOURCES
 	target.custom_minimum_size = Vector2(60, 60)
 	target_row.add_child(target)
 	var target_text := _label("親指と人差し指で\n小さなハート ♥", 17, ACCENT)
@@ -232,8 +235,8 @@ func _next_hand() -> void:
 
 func _refresh_hand() -> void:
 	hand_sprite.texture = textures[current_hand]
-	# Palm-facing poses must have the thumb on the viewer's right (her left hand).
-	hand_sprite.flip_h = current_hand in [HandType.FOX, HandType.POINT]
+	# Normalize each source's actual handedness, including heart and thumbs-up.
+	hand_sprite.flip_h = current_hand in RIGHT_HAND_SOURCES
 	# Mirroring an off-center source wrist needs a matching horizontal correction.
 	hand_sprite.anchor_left = 0.655 if hand_sprite.flip_h else 0.633
 	hand_sprite.anchor_right = hand_sprite.anchor_left + 0.4
