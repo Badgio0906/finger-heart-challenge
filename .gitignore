@@ -1,0 +1,8 @@
+.godot/
+.DS_Store
+Thumbs.db
+*.tmp
+*.log
+node_modules/
+tests/artifacts/
+web/*.import
