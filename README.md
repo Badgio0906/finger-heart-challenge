@@ -31,11 +31,11 @@ HTTP確認先： http://localhost:8765/ （ファイルの直接起動は不可�
 
 - `scenes/Main.tscn`：ゲームの入口
 - `scripts/main.gd`：UI、手の抽選、入力、判定、スコア、演出
-- `assets/woman/woman_body.svg`：固定の女性本体
-- `assets/hands/`：共通座標で差し替える7種の手
-- `assets/ui/`：指ハートのお手本とアイコン
+- `assets/art_v2/body.png`：新しく制作した固定の女性本体
+- `assets/art_v2/`：共通座標で差し替える7種の手。指ハートのお手本も同じ素材を使用
+- `assets/ui/`：アイコン
 - `assets/fonts/`：Noto Sans JPとSIL Open Font License
-- `tools/create-art.mjs`：オリジナルSVG素材の再生成
+- `docs/ART_DIRECTION.md`：イラストの制作方法と最終生成プロンプト
 - `tests/game_test.gd`：抽選、入力、得点、連打、復帰、リセットの自動検証
 - `export_presets.cfg`：Web書き出し設定
 - `.github/workflows/deploy-pages.yml`：公開処理
@@ -49,7 +49,8 @@ HTTP確認先： http://localhost:8765/ （ファイルの直接起動は不可�
 
 ## 素材
 
-女性・手・アイコンはこのゲームのために作成したオリジナルSVGです。特定の実在人物の似顔絵ではありません。
+女性と7種の手は、このゲームのために内蔵image_genで新たに制作した透過PNGです（2026-09-21全面改訂）。特定の実在人物の似顔絵ではありません。
+女性本体と袖は固定し、手の部分だけを差し替えます。アイコンはオリジナルSVGです。
 フォントは [Noto Sans JP](https://github.com/notofonts/noto-cjk/tree/main/Sans/SubsetOTF/JP)（SIL OFL 1.1）を同梱しています。
 外部画像、アクセス解析、広告、サウンド、サーバーへのスコア送信はありません。
 

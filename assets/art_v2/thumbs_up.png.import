@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cbk0on1dvxhi6"
-path="res://.godot/imported/peace.svg-3c763805745311b7b7c513f9f84b980c.ctex"
+uid="uid://mwpm5ois51l"
+path="res://.godot/imported/thumbs_up.png-1b4b9e3f287f6c3f18872fb535f45567.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/hands/peace.svg"
-dest_files=["res://.godot/imported/peace.svg-3c763805745311b7b7c513f9f84b980c.ctex"]
+source_file="res://assets/art_v2/thumbs_up.png"
+dest_files=["res://.godot/imported/thumbs_up.png-1b4b9e3f287f6c3f18872fb535f45567.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

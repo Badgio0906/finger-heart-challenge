@@ -39,7 +39,11 @@ func _ready() -> void:
 	if OS.has_feature("web"):
 		browser_qa = bool(JavaScriptBridge.eval("new URLSearchParams(location.search).get('qa') === '1'"))
 	for file in HAND_FILES:
-		textures.append(load("res://assets/hands/%s.svg" % file))
+		var hand_texture := AtlasTexture.new()
+		hand_texture.atlas = load("res://assets/art_v2/%s.png" % file)
+		# Use the original fixed sleeve; crop generated cuffs from every hand layer.
+		hand_texture.region = Rect2(0, 0, 1254, 900)
+		textures.append(hand_texture)
 	_build_ui()
 	hand_timer = Timer.new()
 	hand_timer.name = "HandTimer"
@@ -126,21 +130,36 @@ func _build_ui() -> void:
 	body_layout.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	stack.add_child(body_layout)
 	art_frame = AspectRatioContainer.new()
-	art_frame.ratio = 600.0 / 560.0
+	art_frame.ratio = 1.0
 	art_frame.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	art_frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body_layout.add_child(art_frame)
 	character = Control.new()
 	character.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	art_frame.add_child(character)
-	var woman := _texture("res://assets/woman/woman_body.svg")
+	var woman := _texture("res://assets/art_v2/body.png")
 	woman.name = "WomanBody"
 	woman.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	character.add_child(woman)
-	hand_sprite = _texture("res://assets/hands/heart.svg")
+	hand_sprite = _texture("res://assets/art_v2/heart.png")
 	hand_sprite.name = "HandSprite"
-	hand_sprite.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	# Match the wrist to the fixed sleeve opening in the 1254px body illustration.
+	hand_sprite.anchor_left = 0.633
+	hand_sprite.anchor_top = 0.280
+	hand_sprite.anchor_right = 1.033
+	hand_sprite.anchor_bottom = 0.280 + 0.4 * 900.0 / 1254.0
 	character.add_child(hand_sprite)
+	# The original cuff front covers the wrist edge for a seamless join.
+	var cuff := _texture("res://assets/art_v2/body.png")
+	var cuff_texture := AtlasTexture.new()
+	cuff_texture.atlas = woman.texture
+	cuff_texture.region = Rect2(975, 705, 185, 140)
+	cuff.texture = cuff_texture
+	cuff.anchor_left = 975.0 / 1254.0
+	cuff.anchor_top = 705.0 / 1254.0
+	cuff.anchor_right = 1160.0 / 1254.0
+	cuff.anchor_bottom = 845.0 / 1254.0
+	character.add_child(cuff)
 	info_panel = PanelContainer.new()
 	info_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	info_panel.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -164,7 +183,11 @@ func _build_ui() -> void:
 	var target_row := HBoxContainer.new()
 	target_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	info.add_child(target_row)
-	var target := _texture("res://assets/ui/target.svg")
+	var target := _texture("res://assets/art_v2/heart.png")
+	var target_crop := AtlasTexture.new()
+	target_crop.atlas = load("res://assets/art_v2/heart.png")
+	target_crop.region = Rect2(390, 160, 470, 740)
+	target.texture = target_crop
 	target.custom_minimum_size = Vector2(60, 60)
 	target_row.add_child(target)
 	var target_text := _label("親指と人差し指で\n小さなハート ♥", 17, ACCENT)
@@ -209,6 +232,11 @@ func _next_hand() -> void:
 
 func _refresh_hand() -> void:
 	hand_sprite.texture = textures[current_hand]
+	# Palm-facing poses must have the thumb on the viewer's right (her left hand).
+	hand_sprite.flip_h = current_hand in [HandType.FOX, HandType.POINT]
+	# Mirroring an off-center source wrist needs a matching horizontal correction.
+	hand_sprite.anchor_left = 0.655 if hand_sprite.flip_h else 0.633
+	hand_sprite.anchor_right = hand_sprite.anchor_left + 0.4
 	hand_label.text = HAND_NAMES[current_hand]
 	_publish_state()
 

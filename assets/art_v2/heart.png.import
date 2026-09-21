@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dbp5cfaks3gai"
-path="res://.godot/imported/thumbs_up.svg-ccec43290df27ebc797d8111a89ac991.ctex"
+uid="uid://bablm8thy1qxl"
+path="res://.godot/imported/heart.png-77b9627b7446c728e74fee186c7a2998.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/hands/thumbs_up.svg"
-dest_files=["res://.godot/imported/thumbs_up.svg-ccec43290df27ebc797d8111a89ac991.ctex"]
+source_file="res://assets/art_v2/heart.png"
+dest_files=["res://.godot/imported/heart.png-77b9627b7446c728e74fee186c7a2998.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false
