@@ -64,6 +64,12 @@ Playwrightを別パスに置く場合は `PLAYWRIGHT_MODULE` にそのモジュ�
 - Web Release書き出し成功。PC 1280×720とスマートフォン相当390×844でOKポーズを実入力で停止し、得点が増えないこと、演出後に再開すること、実行エラー0を確認。
 - 両画面で反転後のOKサインと袖口の接続を目視確認：[修正画面](docs/ok-handedness-fixed.png)。ローカル証拠は `tests/artifacts/ok-fixed-desktop.png`、`ok-fixed-mobile.png`。
 
+## F12：パーの左右修正（2026-09-22）
+
+- F10で手のひら素材も左右を誤判定していた。`HandType.OPEN` を反転対象へ追加し、既存の手首位置補正を適用。
+- Web Release書き出し成功。PC 1280×720・スマートフォン相当390×844でパーを実入力で停止し、加点なし・演出後の再開・実行エラー0を確認。
+- 親指が顔側になる向きと袖口への接続を両画面で目視確認：[修正画面](docs/open-handedness-fixed.png)。ローカル証拠：`tests/artifacts/open-fixed-desktop.png`、`open-fixed-mobile.png`。
+
 ## 検証の限界
 
 - タッチはChromiumのモバイル相当環境。iPhone Safari・Android実機での操作・性能は未確認です。
