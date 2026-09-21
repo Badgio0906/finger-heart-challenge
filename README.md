@@ -53,4 +53,6 @@ HTTP確認先： http://localhost:8765/ （ファイルの直接起動は不可�
 フォントは [Noto Sans JP](https://github.com/notofonts/noto-cjk/tree/main/Sans/SubsetOTF/JP)（SIL OFL 1.1）を同梱しています。
 外部画像、アクセス解析、広告、サウンド、サーバーへのスコア送信はありません。
 
+ゲームエンジン： [Godot Engine — MIT License](https://godotengine.org/license/)。
+
 Web出力設定は[Godot 4.5の公式ガイド](https://docs.godotengine.org/en/4.5/tutorials/export/exporting_for_web.html)に基づき、GitHub Pagesで動作するシングルスレッド構成を採用しています。

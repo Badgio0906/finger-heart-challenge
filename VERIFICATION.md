@@ -18,8 +18,6 @@ Ring SurvivorsのM00〜M13とは別の制作であり、そのファイル・進
 | 小型スマートフォン相当 | 360 × 640 | 合格：タッチ |
 | スマートフォン横画面相当 | 844 × 390 | 合格：タッチ |
 
-## 再現方法
-
 ## 公開先の最終確認
 
 - 公開URL： https://badgio0906.github.io/finger-heart-challenge/
