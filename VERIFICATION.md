@@ -20,6 +20,16 @@ Ring SurvivorsのM00〜M13とは別の制作であり、そのファイル・進
 
 ## 再現方法
 
+## 公開先の最終確認
+
+- 公開URL： https://badgio0906.github.io/finger-heart-challenge/
+- [初回Pages公開処理](https://github.com/Badgio0906/finger-heart-challenge/actions/runs/35613247848)が成功。
+- 公開URLに対して上記4画面のブラウザー検証を再実行し、すべて合格。Enter / Space / クリック / タッチで実際に得点できることを確認。
+- 通常URL（QAなし）もHTTP 200、日本語タイトル一致、ゲーム描画とEnter操作、実行エラー0を確認。
+- ローカル証拠： `tests/artifacts/browser-results.json`、各画面のPNG、`tests/artifacts/public-normal.png`。
+
+## 再現方法
+
 ```powershell
 godot --headless --path . --script tests/game_test.gd
 godot --headless --path . --export-release Web web/index.html

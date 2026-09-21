@@ -9,6 +9,6 @@
 - [x] F05：PC横画面、スマートフォン縦画面・横画面、小型画面の調整
 - [x] F06：Godot動作検証、HTTP経由のブラウザー検証、Web Release書き出し
 - [x] F07：GitHub PublicリポジトリとPagesのActions設定
-- [ ] F08：ソースとWeb出力をpushし、公開URLでの最終検証
+- [x] F08：ソースとWeb出力をpushし、公開URLでの最終検証（PC・スマートフォン相当の4画面すべて合格）
 
 検証方法と証拠は `VERIFICATION.md`。任意の残件は実機Safari/Androidでの追加確認。
