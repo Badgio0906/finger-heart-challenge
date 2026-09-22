@@ -87,6 +87,15 @@ Playwrightを別パスに置く場合は `PLAYWRIGHT_MODULE` にそのモジュ�
 - 両ポーズの向きと袖口への接続を4枚の画面で目視確認。キー・タップによる失敗判定と再挑戦も合格、コンソール・実行エラー0。
 - 証拠：[ピース](docs/peace-handedness-fixed.png)、[人差し指](docs/point-handedness-fixed.png)、`tests/artifacts/f14-peace-mobile.png`、`f14-point-mobile.png`。
 
+## F15：承認済みイラスト3枚の実装（2026-09-22）
+
+- F14の表示についてユーザーから再修正の指示を受け、イラスト提示→ユーザー承認→実装の手順を採用。「OKです、実装してください」の承認後に実装。
+- 提示した人差し指・ピース・キツネを `assets/approved_poses/` にコピーし、元の承認画像とSHA-256一致を確認。再生成・切り抜き・反転は行わず、女性全体を表示。該当3ポーズでは旧手先と袖口の上描きを非表示にし、他ポーズでは復帰させる。
+- Godot検証：12,173チェック、失敗0。Web Release書き出し成功。
+- PC 1280×720、スマートフォン相当390×844で3ポーズおよび指ハートを撮影し、撮影前後の観測値が対象ポーズであることを確認。承認した姿で表示され、旧手先が重ならないことを目視確認。
+- 両画面で指ハートの成功・加点・自動再開・不正解のFailure移行を実入力で確認。コンソール・実行エラー0。
+- 証拠：[人差し指](docs/approved-point-game.png)、[ピース](docs/approved-peace-game.png)、[キツネ](docs/approved-fox-game.png)。スマホ等の追加画面は `tests/artifacts/f15-*.png`。
+
 ## 検証の限界
 
 - タッチはChromiumのモバイル相当環境。iPhone Safari・Android実機での操作・性能は未確認です。

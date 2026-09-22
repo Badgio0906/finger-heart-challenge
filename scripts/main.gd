@@ -9,7 +9,8 @@ const RESULT_DURATION := 0.8
 const HAND_FILES := ["heart", "fox", "peace", "ok", "thumbs_up", "open", "point"]
 const HAND_NAMES := ["指ハート", "キツネ", "ピース", "OKサイン", "サムズアップ", "手のひら", "人差し指"]
 # Generated source sprites contain both hands. The body always raises her left arm.
-const RIGHT_HAND_SOURCES := [HandType.HEART, HandType.FOX, HandType.PEACE, HandType.OK, HandType.THUMBS_UP, HandType.OPEN]
+const RIGHT_HAND_SOURCES := [HandType.HEART, HandType.OK, HandType.THUMBS_UP, HandType.OPEN]
+const APPROVED_POSES := [HandType.FOX, HandType.PEACE, HandType.POINT]
 const INK := Color("543b4b")
 const ACCENT := Color("e85d80")
 const MUTED := Color("927783")
@@ -29,6 +30,10 @@ var result_label: Label
 var hand_label: Label
 var hint_label: Label
 var hand_sprite: TextureRect
+var woman: TextureRect
+var cuff: TextureRect
+var body_texture: Texture2D
+var approved_textures: Dictionary = {}
 var character: Control
 var reset_button: Button
 var body_layout: BoxContainer
@@ -58,6 +63,9 @@ func _ready() -> void:
 		# Use the original fixed sleeve; crop generated cuffs from every hand layer.
 		hand_texture.region = Rect2(0, 0, 1254, 900)
 		textures.append(hand_texture)
+	body_texture = load("res://assets/art_v2/body.png")
+	for pose in APPROVED_POSES:
+		approved_textures[pose] = load("res://assets/approved_poses/%s.png" % HAND_FILES[pose])
 	clear_texture = load("res://assets/art_v2/clear.png")
 	failure_texture = load("res://assets/art_v2/failure.png")
 	_build_ui()
@@ -154,7 +162,7 @@ func _build_ui() -> void:
 	character = Control.new()
 	character.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	art_frame.add_child(character)
-	var woman := _texture("res://assets/art_v2/body.png")
+	woman = _texture("res://assets/art_v2/body.png")
 	woman.name = "WomanBody"
 	woman.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	character.add_child(woman)
@@ -167,7 +175,7 @@ func _build_ui() -> void:
 	hand_sprite.anchor_bottom = 0.280 + 0.4 * 900.0 / 1254.0
 	character.add_child(hand_sprite)
 	# The original cuff front covers the wrist edge for a seamless join.
-	var cuff := _texture("res://assets/art_v2/body.png")
+	cuff = _texture("res://assets/art_v2/body.png")
 	var cuff_texture := AtlasTexture.new()
 	cuff_texture.atlas = woman.texture
 	cuff_texture.region = Rect2(975, 705, 185, 140)
@@ -286,6 +294,11 @@ func _next_hand() -> void:
 	_refresh_hand()
 
 func _refresh_hand() -> void:
+	# Display the approved complete illustrations unchanged, without old hand overlays.
+	var approved := approved_textures.has(current_hand)
+	woman.texture = approved_textures[current_hand] if approved else body_texture
+	hand_sprite.visible = not approved
+	cuff.visible = not approved
 	hand_sprite.texture = textures[current_hand]
 	# Normalize each source's actual handedness, including heart and thumbs-up.
 	hand_sprite.flip_h = current_hand in RIGHT_HAND_SOURCES

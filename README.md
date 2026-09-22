@@ -54,6 +54,7 @@ HTTP確認先： http://localhost:8765/ （ファイルの直接起動は不可�
 
 女性と7種の手は、このゲームのために内蔵image_genで新たに制作した透過PNGです（2026-09-21全面改訂）。特定の実在人物の似顔絵ではありません。
 女性本体と袖は固定し、手の部分だけを差し替えます。アイコンはオリジナルSVGです。
+ただし人差し指・ピース・キツネは、ユーザー確認済みの女性全体画像（`assets/approved_poses/`）を反転せずそのまま表示します。
 結果用の女性イラスト2枚も内蔵image_genで制作しました。保存先と最終プロンプトは `docs/RESULT_ART.md` に記録しています。
 フォントは [Noto Sans JP](https://github.com/notofonts/noto-cjk/tree/main/Sans/SubsetOTF/JP)（SIL OFL 1.1）を同梱しています。
 外部画像、アクセス解析、広告、サウンド、サーバーへのスコア送信はありません。
