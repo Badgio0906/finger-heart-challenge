@@ -70,6 +70,16 @@ Playwrightを別パスに置く場合は `PLAYWRIGHT_MODULE` にそのモジュ�
 - Web Release書き出し成功。PC 1280×720・スマートフォン相当390×844でパーを実入力で停止し、加点なし・演出後の再開・実行エラー0を確認。
 - 親指が顔側になる向きと袖口への接続を両画面で目視確認：[修正画面](docs/open-handedness-fixed.png)。ローカル証拠：`tests/artifacts/open-fixed-desktop.png`、`open-fixed-mobile.png`。
 
+## F13：5段階チャレンジと結果画面（2026-09-22）
+
+- 最新ユーザー指示により、従来の失敗後の自動再開を廃止。5回成功ごとに進み、25回成功でClear・1回の押し間違いでFailureになる。仕様は `docs/CHALLENGE_RULES.md`。
+- 同じ女性のClear / Failure専用イラストを内蔵image_genで制作し、指定メッセージと再挑戦ボタンを実装。素材と最終プロンプトは `docs/RESULT_ART.md`。
+- Godotのロジック検証：12,171チェック、失敗0。5・10・15・20回目の速度変更、25回目のクリア、全不正解ポーズでの終了、結果保持、再挑戦、入力・連打防止・RESETを確認。
+- Web Releaseを書き出し、PC 1280×720とスマートフォン相当390×844の実際のキー・タップでそれぞれ25回成功までプレイ。各段階の速度、Clear / Failureの表示と文言、結果保持、再挑戦、RESETが合格。コンソール・実行エラー0。
+- Clear画面を360×640・844×390へ変更して表示を確認。イラスト・指定文言・再挑戦ボタンが画面内に収まることを目視確認。
+- 証拠：[Clear画面](docs/clear-screen.png)、[Failure画面](docs/failure-screen.png)、`tests/artifacts/browser-results.json`、`clear-*.png`、`failure-*.png`。
+- Web出力から検証資料の画像を除外し、ゲーム内で使用する素材のみを収録。
+
 ## 検証の限界
 
 - タッチはChromiumのモバイル相当環境。iPhone Safari・Android実機での操作・性能は未確認です。

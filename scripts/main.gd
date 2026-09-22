@@ -1,9 +1,10 @@
 extends Control
 
-enum GameState { RUNNING, JUDGING }
+enum GameState { RUNNING, JUDGING, CLEARED, FAILED }
 enum HandType { HEART, FOX, PEACE, OK, THUMBS_UP, OPEN, POINT }
 
-const HAND_CHANGE_INTERVAL := 0.65
+const STAGE_INTERVALS := [0.65, 0.55, 0.45, 0.35, 0.25]
+const SUCCESSES_PER_STAGE := 5
 const RESULT_DURATION := 0.8
 const HAND_FILES := ["heart", "fox", "peace", "ok", "thumbs_up", "open", "point"]
 const HAND_NAMES := ["指ハート", "キツネ", "ピース", "OKサイン", "サムズアップ", "手のひら", "人差し指"]
@@ -17,6 +18,7 @@ var game_state := GameState.RUNNING
 var current_hand := HandType.HEART
 var previous_hand := -1
 var score := 0
+var stage := 0
 var switches_until_heart := 0
 var rng := RandomNumberGenerator.new()
 var textures: Array[Texture2D] = []
@@ -34,6 +36,16 @@ var art_frame: AspectRatioContainer
 var info_panel: PanelContainer
 var motion: Tween
 var browser_qa := false
+var game_content: Control
+var stage_label: Label
+var end_screen: MarginContainer
+var end_art: TextureRect
+var end_title: Label
+var end_message: Label
+var end_progress: Label
+var retry_button: Button
+var clear_texture: Texture2D
+var failure_texture: Texture2D
 
 func _ready() -> void:
 	rng.randomize()
@@ -46,10 +58,12 @@ func _ready() -> void:
 		# Use the original fixed sleeve; crop generated cuffs from every hand layer.
 		hand_texture.region = Rect2(0, 0, 1254, 900)
 		textures.append(hand_texture)
+	clear_texture = load("res://assets/art_v2/clear.png")
+	failure_texture = load("res://assets/art_v2/failure.png")
 	_build_ui()
 	hand_timer = Timer.new()
 	hand_timer.name = "HandTimer"
-	hand_timer.wait_time = HAND_CHANGE_INTERVAL
+	hand_timer.wait_time = STAGE_INTERVALS[0]
 	hand_timer.timeout.connect(_next_hand)
 	add_child(hand_timer)
 	result_timer = Timer.new()
@@ -101,6 +115,7 @@ func _build_ui() -> void:
 	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(background)
 	var margin := MarginContainer.new()
+	game_content = margin
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for side in ["left", "right", "top", "bottom"]:
 		margin.add_theme_constant_override("margin_" + side, 24)
@@ -170,7 +185,9 @@ func _build_ui() -> void:
 	var info := VBoxContainer.new()
 	info.add_theme_constant_override("separation", 7)
 	info_panel.add_child(info)
-	score_label = _label("SCORE: 0", 34, ACCENT)
+	stage_label = _label("STAGE 1 / 5", 20, MUTED)
+	info.add_child(stage_label)
+	score_label = _label("成功 0 / 5", 34, ACCENT)
 	info.add_child(score_label)
 	var line := HSeparator.new()
 	line.modulate = Color("ecdce1")
@@ -200,8 +217,43 @@ func _build_ui() -> void:
 	stack.add_child(callout)
 	callout.add_child(_label("画面のどこでもタップでストップ！", 21, Color.WHITE))
 	stack.add_child(_label("PC は ENTER / SPACE / クリックでも OK", 16, MUTED))
-	stack.add_child(_label("失敗しても大丈夫。何度でもチャレンジ！", 15, MUTED))
+	stack.add_child(_label("5回成功でスピードアップ・全5段階に挑戦！", 15, MUTED))
 	_ignore_layout_input(margin)
+	_build_end_screen()
+
+func _build_end_screen() -> void:
+	end_screen = MarginContainer.new()
+	end_screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	for side in ["left", "right", "top", "bottom"]:
+		end_screen.add_theme_constant_override("margin_" + side, 24)
+	add_child(end_screen)
+	var stack := VBoxContainer.new()
+	stack.add_theme_constant_override("separation", 10)
+	end_screen.add_child(stack)
+	stack.add_child(_label("畑島さんの指ハートチャレンジ", 22, MUTED))
+	end_art = _texture("res://assets/art_v2/clear.png")
+	end_art.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	stack.add_child(end_art)
+	end_title = _label("Clear", 52, ACCENT)
+	stack.add_child(end_title)
+	end_message = _label("", 26)
+	end_message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	stack.add_child(end_message)
+	end_progress = _label("", 18, MUTED)
+	stack.add_child(end_progress)
+	retry_button = Button.new()
+	retry_button.text = "もう一度チャレンジ"
+	retry_button.custom_minimum_size = Vector2(300, 62)
+	retry_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	retry_button.focus_mode = Control.FOCUS_NONE
+	retry_button.add_theme_color_override("font_color", Color.WHITE)
+	retry_button.add_theme_stylebox_override("normal", _style(ACCENT))
+	retry_button.add_theme_stylebox_override("hover", _style(Color("ee7896")))
+	retry_button.add_theme_stylebox_override("pressed", _style(Color("ce4268")))
+	retry_button.pressed.connect(reset_game)
+	stack.add_child(retry_button)
+	_ignore_layout_input(end_screen)
+	end_screen.hide()
 
 func _ignore_layout_input(node: Node) -> void:
 	if node is Control and not node is Button:
@@ -248,15 +300,20 @@ func _publish_state() -> void:
 	if not browser_qa:
 		return
 	var button_rect := reset_button.get_global_rect()
+	var retry_rect := retry_button.get_global_rect()
 	var state := {"state": game_state, "hand": current_hand, "score": score,
 		"result": result_label.text, "width": size.x, "height": size.y,
+		"stage": stage + 1, "interval": hand_timer.wait_time,
+		"ending": end_title.text if end_screen.visible else "", "message": end_message.text,
+		"retry": [retry_rect.position.x, retry_rect.position.y, retry_rect.size.x, retry_rect.size.y],
 		"reset": [button_rect.position.x, button_rect.position.y, button_rect.size.x, button_rect.size.y]}
 	JavaScriptBridge.eval("window.__fingerHeart = " + JSON.stringify(state))
 
 func _input(event: InputEvent) -> void:
 	# Touch is handled before the Button consumes it; mouse uses Button.pressed.
 	if event is InputEventScreenTouch and event.pressed:
-		if reset_button.get_global_rect().has_point(event.position):
+		var button := retry_button if end_screen.visible else reset_button
+		if button.get_global_rect().has_point(event.position):
 			reset_game()
 			get_viewport().set_input_as_handled()
 
@@ -265,7 +322,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		stop = event.button_index == MOUSE_BUTTON_LEFT and event.pressed
 	if event is InputEventScreenTouch:
-		if event.pressed and reset_button.get_global_rect().has_point(event.position):
+		var button := retry_button if end_screen.visible else reset_button
+		if event.pressed and button.get_global_rect().has_point(event.position):
 			reset_game()
 			get_viewport().set_input_as_handled()
 			return
@@ -280,16 +338,21 @@ func stop_hand() -> void:
 	game_state = GameState.JUDGING
 	hand_timer.stop()
 	var success := current_hand == HandType.HEART
+	if not success:
+		_finish(false)
+		return
 	if success:
 		score += 1
+		if score == SUCCESSES_PER_STAGE * STAGE_INTERVALS.size():
+			_finish(true)
+			return
 		result_label.text = "指ハート！ +1"
+		if score % SUCCESSES_PER_STAGE == 0:
+			result_label.text = "次のステージへ！"
+			hand_label.text = "スピードアップ！"
 		result_label.add_theme_color_override("font_color", ACCENT)
 		hint_label.text = "♥  やったね！  ♥"
-	else:
-		result_label.text = "ざんねん！"
-		result_label.add_theme_color_override("font_color", INK)
-		hint_label.text = "もう一度、ハートをねらおう"
-	score_label.text = "SCORE: %d" % score
+	score_label.text = "成功 %d / 5" % (score - stage * SUCCESSES_PER_STAGE)
 	if motion:
 		motion.kill()
 	character.pivot_offset = character.size * 0.5
@@ -305,19 +368,47 @@ func stop_hand() -> void:
 	_publish_state()
 
 func _resume() -> void:
+	if game_state != GameState.JUDGING:
+		return
+	stage = mini(score / SUCCESSES_PER_STAGE, STAGE_INTERVALS.size() - 1)
+	hand_timer.wait_time = STAGE_INTERVALS[stage]
+	stage_label.text = "STAGE %d / 5" % (stage + 1)
+	score_label.text = "成功 %d / 5" % (score % SUCCESSES_PER_STAGE)
 	game_state = GameState.RUNNING
 	result_label.text = "指ハートをねらって！"
 	result_label.add_theme_color_override("font_color", INK)
 	hint_label.text = "この形でストップできたら +1"
 	_next_hand()
 	hand_timer.start()
+	_publish_state()
+
+func _finish(cleared: bool) -> void:
+	game_state = GameState.CLEARED if cleared else GameState.FAILED
+	hand_timer.stop()
+	result_timer.stop()
+	if motion:
+		motion.kill()
+	game_content.hide()
+	end_art.texture = clear_texture if cleared else failure_texture
+	end_title.text = "Clear" if cleared else "Failure"
+	end_title.add_theme_color_override("font_color", ACCENT if cleared else INK)
+	end_message.text = "これであなたも指ハートマスター" if cleared else "指ハートマスターへの道は遠い"
+	end_progress.text = "全5段階クリア！  25 / 25" if cleared else "STAGE %d / 5 ・ 成功 %d / 25" % [stage + 1, score]
+	end_screen.show()
+	# Publish after the newly visible container has laid out its retry button.
+	_publish_state.call_deferred()
 
 func reset_game() -> void:
 	score = 0
-	score_label.text = "SCORE: 0"
+	stage = 0
+	switches_until_heart = 0
+	current_hand = HandType.HEART
+	end_screen.hide()
+	game_content.show()
 	result_timer.stop()
 	if motion:
 		motion.kill()
 	character.scale = Vector2.ONE
 	character.rotation = 0.0
+	game_state = GameState.JUDGING
 	_resume()
