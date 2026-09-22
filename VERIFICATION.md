@@ -80,6 +80,13 @@ Playwrightを別パスに置く場合は `PLAYWRIGHT_MODULE` にそのモジュ�
 - 証拠：[Clear画面](docs/clear-screen.png)、[Failure画面](docs/failure-screen.png)、`tests/artifacts/browser-results.json`、`clear-*.png`、`failure-*.png`。
 - Web出力から検証資料の画像を除外し、ゲーム内で使用する素材のみを収録。
 
+## F14：人差し指・ピースの左右修正（2026-09-22）
+
+- F10での左右判定を訂正。人差し指は反転対象から外し、ピースを反転対象へ追加した。既存の手首位置補正もそれぞれの向きに合わせて適用。
+- Web Release書き出し成功。PC 1280×720・スマートフォン相当390×844で、進行中の両ポーズを撮影し、撮影前後の観測値が対象ポーズであることも確認。
+- 両ポーズの向きと袖口への接続を4枚の画面で目視確認。キー・タップによる失敗判定と再挑戦も合格、コンソール・実行エラー0。
+- 証拠：[ピース](docs/peace-handedness-fixed.png)、[人差し指](docs/point-handedness-fixed.png)、`tests/artifacts/f14-peace-mobile.png`、`f14-point-mobile.png`。
+
 ## 検証の限界
 
 - タッチはChromiumのモバイル相当環境。iPhone Safari・Android実機での操作・性能は未確認です。

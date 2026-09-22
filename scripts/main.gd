@@ -9,7 +9,7 @@ const RESULT_DURATION := 0.8
 const HAND_FILES := ["heart", "fox", "peace", "ok", "thumbs_up", "open", "point"]
 const HAND_NAMES := ["指ハート", "キツネ", "ピース", "OKサイン", "サムズアップ", "手のひら", "人差し指"]
 # Generated source sprites contain both hands. The body always raises her left arm.
-const RIGHT_HAND_SOURCES := [HandType.HEART, HandType.FOX, HandType.OK, HandType.THUMBS_UP, HandType.OPEN, HandType.POINT]
+const RIGHT_HAND_SOURCES := [HandType.HEART, HandType.FOX, HandType.PEACE, HandType.OK, HandType.THUMBS_UP, HandType.OPEN]
 const INK := Color("543b4b")
 const ACCENT := Color("e85d80")
 const MUTED := Color("927783")
